@@ -1,3 +1,5 @@
+*Updated for iOS 8.0 with ARC.*
+
 This is an iPhone ready version of:
 http://oauth.googlecode.com/svn/code/obj-c/OAuthConsumer/
 
@@ -12,4 +14,4 @@ include "$SDKROOT/usr/include/libxml2" with "Recursive" checked.
 
 Be sure to include sys/types.h.
 
-Questions?  E-mail me.  jonathan at my initials (jdg) dot net.
+[Included for posterity: Questions?  E-mail me.  jonathan at my initials (jdg) dot net.]
