@@ -31,21 +31,27 @@
 
 #pragma mark init
 
-- (id)initWithKey:(NSString *)aKey secret:(NSString *)aSecret 
-{
-	if (self = [super init])
-	{
+- (id)initWithKey:(NSString *)aKey secret:(NSString *)aSecret {
+	if ((self = [super init])) {
 		self.key = aKey;
 		self.secret = aSecret;
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[key release];
-	[secret release];
-	[super dealloc];
+- (void)dealloc {
+}
+
+- (BOOL)isEqual:(id)object {
+	if ([object isKindOfClass:[self class]]) {
+		return [self isEqualToConsumer:(OAConsumer*)object];
+	}
+	return NO;
+}
+
+- (BOOL)isEqualToConsumer:(OAConsumer *)aConsumer {
+	return ([self.key isEqualToString:aConsumer.key] &&
+			[self.secret isEqualToString:aConsumer.secret]);
 }
 
 @end

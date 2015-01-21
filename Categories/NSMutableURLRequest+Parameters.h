@@ -1,6 +1,5 @@
 //
-//  OAMutableURLRequest.h
-//  OAuthConsumer
+//  NSMutableURLRequest+Parameters.h
 //
 //  Created by Jon Crosby on 10/19/07.
 //  Copyright 2007 Kaboomerang LLC. All rights reserved.
@@ -23,43 +22,16 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-
 #import <Foundation/Foundation.h>
-#import "OAConsumer.h"
-#import "OAToken.h"
-#import "OAHMAC_SHA1SignatureProvider.h"
-#import "OASignatureProviding.h"
-#import "NSMutableURLRequest+Parameters.h"
+#import "OARequestParameter.h"
 #import "NSURL+Base.h"
 
 
-@interface OAMutableURLRequest : NSMutableURLRequest {
-@protected
-    OAConsumer *consumer;
-    OAToken *token;
-    NSString *realm;
-    NSString *signature;
-    id<OASignatureProviding> signatureProvider;
-    NSString *nonce;
-    NSString *timestamp;
-}
-@property(readonly) NSString *signature;
-@property(readonly) NSString *nonce;
+@interface NSMutableURLRequest (OAParameterAdditions)
 
-- (id)initWithURL:(NSURL *)aUrl
-		 consumer:(OAConsumer *)aConsumer
-			token:(OAToken *)aToken
-            realm:(NSString *)aRealm
-signatureProvider:(id<OASignatureProviding>)aProvider;
+@property(nonatomic, retain) NSArray *parameters;
 
-- (id)initWithURL:(NSURL *)aUrl
-		 consumer:(OAConsumer *)aConsumer
-			token:(OAToken *)aToken
-            realm:(NSString *)aRealm
-signatureProvider:(id<OASignatureProviding>)aProvider
-            nonce:(NSString *)aNonce
-        timestamp:(NSString *)aTimestamp;
-
-- (void)prepare;
+- (void)setHTTPBodyWithString:(NSString *)body;
+- (void)attachFileWithName:(NSString *)name filename:(NSString*)filename contentType:(NSString *)contentType data:(NSData*)data;
 
 @end

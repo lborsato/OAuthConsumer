@@ -29,37 +29,53 @@
 
 @implementation OADataFetcher
 
-- (void)fetchDataWithRequest:(OAMutableURLRequest *)aRequest 
-					delegate:(id)aDelegate 
-		   didFinishSelector:(SEL)finishSelector 
-			 didFailSelector:(SEL)failSelector 
-{
-    request = aRequest;
+- (id)init {
+	if ((self = [super init])) {
+		responseData = [[NSMutableData alloc] init];
+	}
+	return self;
+}
+
+- (void)dealloc {
+}
+
+/* Protocol for async URL loading */
+- (void)connection:(NSURLConnection *)aConnection didReceiveResponse:(NSURLResponse *)aResponse {
+	response = aResponse;
+	[responseData setLength:0];
+}
+	
+- (void)connection:(NSURLConnection *)aConnection didFailWithError:(NSError *)error {
+	OAServiceTicket *ticket = [[OAServiceTicket alloc] initWithRequest:request
+															  response:response
+																  data:responseData
+															didSucceed:NO];
+
+	[delegate performSelector:didFailSelector withObject:ticket withObject:error];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+	[responseData appendData:data];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+	OAServiceTicket *ticket = [[OAServiceTicket alloc] initWithRequest:request
+															  response:response
+																  data:responseData
+															didSucceed:[(NSHTTPURLResponse *)response statusCode] < 400];
+
+	[delegate performSelector:didFinishSelector withObject:ticket withObject:responseData];
+}
+
+- (void)fetchDataWithRequest:(OAMutableURLRequest *)aRequest delegate:(id)aDelegate didFinishSelector:(SEL)finishSelector didFailSelector:(SEL)failSelector {
+	request = aRequest;
     delegate = aDelegate;
     didFinishSelector = finishSelector;
     didFailSelector = failSelector;
     
     [request prepare];
-    
-    responseData = [NSURLConnection sendSynchronousRequest:request
-                                         returningResponse:&response
-                                                     error:&error];
-	
-    if (response == nil || responseData == nil || error != nil) {
-        OAServiceTicket *ticket= [[OAServiceTicket alloc] initWithRequest:request
-                                                                 response:response
-                                                               didSucceed:NO];
-        [delegate performSelector:didFailSelector
-                       withObject:ticket
-                       withObject:error];
-    } else {
-        OAServiceTicket *ticket = [[OAServiceTicket alloc] initWithRequest:request
-                                                                  response:response
-                                                                didSucceed:[(NSHTTPURLResponse *)response statusCode] < 400];
-        [delegate performSelector:didFinishSelector
-                       withObject:ticket
-                       withObject:responseData];
-    }   
+
+	connection = [[NSURLConnection alloc] initWithRequest:aRequest delegate:self];
 }
 
 @end
