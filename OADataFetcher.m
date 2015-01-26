@@ -27,8 +27,6 @@
 #import "OADataFetcher.h"
 
 
-
-
 @implementation OADataFetcher
 
 - (id)init {
@@ -46,24 +44,17 @@
 	response = aResponse;
 	[responseData setLength:0];
 }
-
-
-- (void)connection:(NSURLConnection *)aConnection didFailWithError:(NSError *)error
-{
+	
+- (void)connection:(NSURLConnection *)aConnection didFailWithError:(NSError *)error {
 	OAServiceTicket *ticket = [[OAServiceTicket alloc] initWithRequest:request
 															  response:response
 																  data:responseData
 															didSucceed:NO];
 
-	if ( delegate )
-		[delegate performSelector:didFailSelector withObject:ticket withObject:error];
-	else if ( callback )
-		callback(ticket, nil, error);
+	[delegate performSelector:didFailSelector withObject:ticket withObject:error];
 }
 
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
 	[responseData appendData:data];
 }
 
@@ -73,21 +64,12 @@
 																  data:responseData
 															didSucceed:[(NSHTTPURLResponse *)response statusCode] < 400];
 
-	if ( delegate )
-		[delegate performSelector:didFinishSelector withObject:ticket withObject:responseData];
-	else if (callback )
-		callback(ticket, responseData, nil);
+	[delegate performSelector:didFinishSelector withObject:ticket withObject:responseData];
 }
 
-
-- (void)fetchDataWithRequest:(OAMutableURLRequest *)aRequest
-					delegate:(id)aDelegate
-		   didFinishSelector:(SEL)finishSelector
-			 didFailSelector:(SEL)failSelector
-{
+- (void)fetchDataWithRequest:(OAMutableURLRequest *)aRequest delegate:(id)aDelegate didFinishSelector:(SEL)finishSelector didFailSelector:(SEL)failSelector {
 	request = aRequest;
     delegate = aDelegate;
-	callback = nil;
     didFinishSelector = finishSelector;
     didFailSelector = failSelector;
     
@@ -96,16 +78,4 @@
 	connection = [[NSURLConnection alloc] initWithRequest:aRequest delegate:self];
 }
 
-
-- (void)fetchDataWithRequest:(OAMutableURLRequest *)aRequest
-					handler:(OADataFetcherRequestCompletedBlock)_callback
-{
-	request = aRequest;
-	callback = _callback;
-	delegate = nil;
-	
-	[request prepare];
-	
-	connection = [[NSURLConnection alloc] initWithRequest:aRequest delegate:self];
-}
 @end

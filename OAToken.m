@@ -127,7 +127,6 @@
       renewable = [[OAToken loadSetting:@"renewable" provider:provider prefix:prefix] boolValue];
 
       if (![self isValid]) {
-        self;
         return nil;
       }
   }
